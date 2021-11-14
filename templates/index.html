@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <title>Joke Generator</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script type="text/javascript">
+      $(document).ready(function(){
+        $("#newJoke").click(function(){
+          $("#viewJoke").load("http://127.0.0.1:5000/random");
+        });
+      });
+    </script> -->
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("#newJoke").click(function(event){
+          $.getJSON("http://127.0.0.1:5000/random", function(jk){
+            $("#viewJoke").html('<p>' + jk.joke + '</p>');
+            $("#viewJoke").append('<p>' + jk.punchline + '</p>');
+          });
+        });
+      });
+    </script>
+  </head>
+  <body class="text-center d-flex flex-column min-vh-100">
+
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+
+      <main role="main" class="inner cover">
+        <h1 class="cover-heading">Random Joke Generator</h1>
+        <div class="container">
+          <p id="viewJoke" class="lead">
+            <img src="../static/pics/dad-jokes.jpeg">
+          </p>
+        </div>
+        <p class="lead">
+          <a id="newJoke" class="btn btn-lg btn-secondary">More Jokes!!!</a>
+        </p>
+      </main>
+
+      
+    </div>
+<footer class="mt-auto py-3 bg-light">
+        <div class="inner">
+          <p>Made by Ashley Ritchie</p>
+        </div>
+      </footer>
+
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
