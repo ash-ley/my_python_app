@@ -4,36 +4,88 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <title>Joke Generator</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- <script type="text/javascript">
-      $(document).ready(function(){
-        $("#newJoke").click(function(){
-          $("#viewJoke").load("http://127.0.0.1:5000/random");
-        });
-      });
-    </script> -->
+    <script src="/static/js/jquery.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
         $("#newJoke").click(function(event){
-          $.getJSON("http://127.0.0.1:5000/random", function(jk){
+          $.getJSON("/random", function(jk){
             $("#viewJoke").html('<p>' + jk.joke + '</p>');
             $("#viewJoke").append('<p>' + jk.punchline + '</p>');
           });
         });
+
+        $("#getJoke").click(function(){ // Grabs the joke based on ID to then update
+          $.getJSON("/jokes/" + $('#updateJokeID').val(), function(jk){
+            $("#updateJoke").val(jk.joke);
+            $("#updatePunchline").val(jk.punchline);
+          })
+          .fail(function(){ alert("Joke doesn't exist."); });
+        });
+        
+        $("#updateJokeBtn").click(function(){ // Updates the joke
+        $.ajax({
+        url: "/joke/update/" + $('#updateJokeID').val(),
+        type: "GET",
+        data: { 
+          joke: $('#updateJoke').val(), 
+          punchline: $('#updatePunchline').val()
+        },
+        success: function(response) {
+          $("#updateMessage").html("<p class='alert alert-success'>Joke ID:" + $('#updateJokeID').val() + " " + response + "</p>");
+        },
+        error: function(xhr) {
+          alert("Error updating joke: " + xhr)
+        }
+      });
+    });
+
+        $("#deleteJokeBtn").click(function(){ // Deletes a joke based on ID
+        $.ajax({
+          type: 'PUT',
+          url: '/delete/' + $('#deleteJokeID').val(),
+          contentType: "application/json",
+          success: function(response) {
+            $("#deleteMessage").html("<p class='alert alert-success'>Joke ID:" + $('#deleteJokeID').val() + " " + response + "</p>");
+        },
+          error: function(response){
+            $("#deleteMessage").html("<p class='alert alert-warning'>The Joke doesn't exist.</p>");
+          }
+      });
+      });
+
+      $("#submitJoke").click(function(){ // Add a joke
+        $.ajax({
+        url: '/joke/add',
+        type: 'POST',
+        dataType: 'json',
+        data: JSON.stringify({
+          'joke' : {
+            'joke' : $('#addJoke').val(), 'punchline' : $('#addPunchline').val()
+          }
+        }),
+        contentType: "application/json",
+        success: function(response) {
+          $("#addMessage").html("<p class='alert alert-success'>Joke has been successfully added.</p>");
+        },
+        error: function(response){
+          $("#addMessage").html("<p class='alert alert-success'>Joke has been successfully added.</p>");
+        }
+      });
+      });
       });
     </script>
   </head>
   <body class="text-center d-flex flex-column min-vh-100">
 
-    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+    <div class="cover-container d-flex h-100 p-3 flex-column">
 
       <main role="main" class="inner cover">
         <h1 class="cover-heading">Random Joke Generator</h1>
         <div class="container">
           <p id="viewJoke" class="lead">
-            <img src="../static/pics/dad-jokes.jpeg">
+            <img src="/static/pics/dad-jokes.jpeg">
           </p>
         </div>
         <p class="lead">
@@ -41,7 +93,59 @@
         </p>
       </main>
 
-      
+      <div class="container">
+  <div class="row gx-5">
+
+    <div class="col-lg-4 col-md-6">
+      <h3>Add</h3>
+      <form>
+        <div class="form-group">
+          <label for="addJoke">Joke:</label>
+          <input class="form-control" type="text" id="addJoke" placeholder="I'm afraid for calenders!"><br>
+          <label for="addPunchline">Punchline:</label>
+          <input class="form-control" type="text" id="addPunchline" placeholder="Its days are numbered."><br>
+          <a id="submitJoke" class="btn btn-secondary">ADD</a>
+          <p id="addMessage"></p>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <h3>Update</h3><br>
+      <form>
+        <div class="input-group">
+          <label for="updateJokeID" class="input-group-text">Joke:</label>
+          <input class="form-control" type="number" min="1" id="updateJokeID">
+          <a class="btn btn-secondary input-group-addon" id="getJoke">Get Joke</a>
+        </div>
+          <br>
+          <div class="form-group">
+            <label for="updateJoke">Joke:</label>
+            <input class="form-control" type="text" id="updateJoke" placeholder="What do you call a bundle of hay in a church?"><br>
+            <label for="updatePunchline">Punchline:</label>
+            <input class="form-control" type="text" id="updatePunchline" placeholder="Christian Bale"><br>
+            <a id="updateJokeBtn" class="btn btn-secondary">UPDATE</a>
+            <p id="updateMessage"></p>
+          </div>
+        </div>
+      </form>
+    
+
+    <div class="col-lg-4 col-md-6">
+      <h3>Delete</h3><br>
+      <form>
+        <div class="input-group">
+          <label for="deleteJokeID" class="input-group-text">Joke ID:</label>
+          <input class="form-control" type="number" min="1" id="deleteJokeID"><br>
+          <a id="deleteJokeBtn" class="btn btn-secondary input-group-addon">DELETE</a>
+          <p id="deleteMessage"></p>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+      </div>
     </div>
 <footer class="mt-auto py-3 bg-light">
         <div class="inner">
@@ -49,6 +153,6 @@
         </div>
       </footer>
 
-    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

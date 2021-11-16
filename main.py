@@ -42,7 +42,8 @@ def delete_joke(id):
 def update_joke(id):
     joke = request.args.get('joke', None)
     punchline = request.args.get('punchline', None)
-    jokes[id] = {
+
+    jokes[int(id)] = {
         'joke' : joke,
         'punchline' : punchline
     }
@@ -66,7 +67,7 @@ def add_joke():
     
     current_id += 1
     new_joke = { current_id : joke }
-    jokes = new_joke.update(joke)
+    jokes.update(new_joke)
 
     return "Joke was added successfully"
 
